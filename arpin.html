@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free PIN Generator & Access Key</title>
+    <style>
+        /* General Styling */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; flex-direction: column; align-items: center; }
+        .container { max-width: 800px; width: 100%; display: grid; grid-template-columns: 1fr; gap: 20px; }
+        
+        /* PIN Generator Card */
+        .generator-card { background: linear-gradient(145deg, #ffffff, #f0f0f0); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; }
+        .generator-card h2 { color: #007bff; margin-top: 0; font-weight: 700; }
+        #pinResult { font-size: 3em; font-weight: 800; color: #28a745; letter-spacing: 5px; margin: 20px 0; background-color: #e9fbe9; padding: 10px; border-radius: 8px; border: 2px dashed #28a745; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Buttons */
+        #generateBtn, #copyBtn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease; margin: 5px; }
+        #generateBtn { background-color: #007bff; color: white; width: 100%; max-width: 300px; margin-bottom: 15px; }
+        #generateBtn:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+        #generateBtn:hover:not(:disabled) { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4); }
+        #copyBtn { background-color: #28a745; color: white; display: none; }
+        #copyBtn:hover { background-color: #1e7e34; transform: translateY(-2px); }
+
+        /* Ad Slots and Messages */
+        .ad-slot { background-color: #e8eaf6; border: 1px solid #c5cae9; border-radius: 8px; padding: 15px; text-align: center; font-size: 0.9em; color: #5c6bc0; min-height: 100px; }
+        .message-box { margin-top: 15px; padding: 10px; border-radius: 8px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .error { color: #dc3545; font-weight: 600; }
+        .ad-slot-banner { max-width: 800px; width: 100%; margin-bottom: 20px; display: flex; justify-content: center; }
+
+        @media (min-width: 600px) {
+            .container { grid-template-columns: 1fr 1fr; }
+            .generator-card { grid-column: 1 / span 2; }
+        }
+    </style>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9859721047385323" crossorigin="anonymous"></script> 
+</head>
+<body>
+    
+    <div class="ad-slot ad-slot-banner">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:728px;height:90px"
+             data-ad-client="ca-pub-9859721047385323"
+             data-ad-slot="5096901351"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <div class="container">
+        <div class="generator-card">
+            <h2>Androidrepublica Kodi Add-ons</h2>
+            <p class="message-box" id="message">Tekan butang dibawah untuk mendapatkan access PIN.</p>
+            
+            <div style="margin: 20px auto;">
+                <button id="generateBtn" onclick="getPinWithDelay()">GET LATEST PIN</button>
+            </div>
+
+            <p id="pinResult">******</p>
+            <button id="copyBtn" onclick="copyPin()">Copy PIN to Clipboard</button>
+        </div>
+
+        <div class="ad-slot">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9859721047385323" data-ad-slot="7723064695" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <div class="ad-slot">
+            <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9859721047385323" data-ad-slot="2388629923" data-ad-format="auto" data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+    </div>
+
+    <script>
+        const PIN_SOURCE_URL = 'https://raw.githubusercontent.com/androidrepublica/kodimalaysia/refs/heads/main/AR';
+
+        async function getPinWithDelay() {
+            const pinResult = document.getElementById('pinResult');
+            const message = document.getElementById('message');
+            const genBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // 1. Start sequence & disable button (prevents skipping ads)
+            genBtn.disabled = true;
+            copyBtn.style.display = 'none';
+            
+            // 2. Artificial delay messages to keep user on page for ad impressions
+            const steps = ["Connecting to Secure Server...", "Verifying Access...", "Generating Final PIN..."];
+            for (let stepText of steps) {
+                message.textContent = stepText;
+                pinResult.textContent = "Loading...";
+                await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds per step
+            }
+
+            // 3. Actual Fetch
+            try {
+                const response = await fetch(PIN_SOURCE_URL, { cache: 'no-store' });
+                if (!response.ok) throw new Error("CORS or Network Error");
+
+                const fetchedPin = (await response.text()).trim();
+                pinResult.textContent = fetchedPin;
+                message.textContent = 'PIN Generated successfully!';
+                copyBtn.style.display = 'inline-block';
+            } catch (e) {
+                pinResult.textContent = 'ERROR';
+                message.innerHTML = '<span class="error">Failed to fetch. Please refresh or check your connection.</span>';
+            } finally {
+                genBtn.disabled = false;
+            }
+        }
+
+        function copyPin() {
+            const pin = document.getElementById('pinResult').textContent;
+            navigator.clipboard.writeText(pin).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy PIN to Clipboard', 2000);
+            });
+        }
+    </script>
+</body>
+</html>
